@@ -1,2 +1,6 @@
 How to implement TLE to Cesium JS
 https://community.cesium.com/t/how-to-implement-multiple-tle-data-with-react-and-cesium/39971/2
+
+
+Ideas, specially for visualizer
+https://github.com/dsuarezv/satellite-tracker

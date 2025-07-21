@@ -3,7 +3,7 @@ import fetchTLE from './fetchTLE.js';
 
 window.CESIUM_BASE_URL = '/';
 
-import { Cartesian3, createOsmBuildingsAsync, Ion, Math as CesiumMath, Terrain, Viewer } from 'cesium';
+import { Cartesian3, createOsmBuildingsAsync, Ion, Math as CesiumMath, Terrain, Viewer, Color} from 'cesium';
 import "cesium/Build/Cesium/Widgets/widgets.css";
 
 Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjkzOTNjYy0xOGI4LTQ1M2QtOTNiOS0zNTM2OTFiMTg4MTQiLCJpZCI6MzIyMTQ3LCJpYXQiOjE3NTI2OTQ5ODV9.c5dy8PXgAJzN1kAyAjZ03WzqxgEYpS2mAJB6qU0Yq3U';

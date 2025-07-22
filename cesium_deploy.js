@@ -12,7 +12,7 @@
     // Your access token can be found at: https://ion.cesium.com/tokens.
     // Replace `your_access_token` with your Cesium ion access token.
 
-    Cesium.Ion.defaultAccessToken = 'your_access_token';
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjkzOTNjYy0xOGI4LTQ1M2QtOTNiOS0zNTM2OTFiMTg4MTQiLCJpZCI6MzIyMTQ3LCJpYXQiOjE3NTI2OTQ5ODV9.c5dy8PXgAJzN1kAyAjZ03WzqxgEYpS2mAJB6qU0Yq3U';
 
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
     const viewer = new Cesium.Viewer('cesiumContainer', {

@@ -1,4 +1,4 @@
-export const getPositionFromTle = (station, date, type = 1) => {
+export const getPositionFromTLE = (station, date, type = 1) => {
     if (!station || !date) return null;
 
     const positionVelocity = getSolution(station, date);

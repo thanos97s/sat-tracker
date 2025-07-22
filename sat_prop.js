@@ -1,8 +1,8 @@
 const sat_prop(tleSets) = async() => {
 
 import * as satellite from 'satellite.js';
-//const tleData = await fetchTLE();
-//const iss = tleData.find(sat => sat.name.includes('ISS'));
+const TLEData = await fetchTLE();
+const iss = TLEData.find(sat => sat.name.includes('ISS'));
 
 
   // Sample TLE

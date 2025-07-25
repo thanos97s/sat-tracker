@@ -17,6 +17,12 @@
     const viewer = new Cesium.Viewer('cesiumContainer', {
       terrain: Cesium.Terrain.fromWorldTerrain(),
     });
+
+    viewer.entities.add({
+      name: "ISS",
+      position: Cesium.Cartesian3.fromDegrees(Sets[0].lon, Sets[0].lat, Sets[0].alt),
+      point: { pixelSize: 10, color: Cesium.Color.RED }
+    });
     
     // Add Cesium OSM Buildings, a global 3D buildings layer.
     const buildingTileset = await Cesium.createOsmBuildingsAsync();

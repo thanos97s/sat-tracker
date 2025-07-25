@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Weather Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .last-updated {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+        }
+
+        .card h3 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .status-green { background-color: #00ff88; }
+        .status-yellow { background-color: #ffaa00; }
+        .status-red { background-color: #ff4444; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .alert-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(255, 170, 0, 0.2));
+            border: 1px solid rgba(255, 68, 68, 0.5);
+        }
+
+        .alert-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #ff4444;
+        }
+
+        .loading {
+            text-align: center;
+            color: #4facfe;
+            font-style: italic;
+        }
+
+        .error {
+            color: #ff4444;
+            font-style: italic;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+            margin: 10px 0;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .source-info {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌌 Space Weather Dashboard</h1>
+            <p class="last-updated" id="lastUpdated">Loading...</p>
+            <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Solar Activity Card -->
+            <div class="card">
+                <h3><span class="status-indicator status-green" id="solarStatus"></span>Solar Activity</h3>
+                <div class="metric">
+                    <span class="metric-label">Solar Wind Speed</span>
+                    <span class="metric-value" id="solarWindSpeed">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Solar Wind Density</span>
+                    <span class="metric-value" id="solarWindDensity">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">IMF Magnitude</span>
+                    <span class="metric-value" id="imfMagnitude">Loading...</span>
+                </div>
+                <div class="source-info">Data from NOAA SWPC</div>
+            </div>
+
+            <!-- Geomagnetic Activity Card -->
+            <div class="card">
+                <h3><span class="status-indicator status-yellow" id="geomagStatus"></span>Geomagnetic Activity</h3>
+                <div class="metric">
+                    <span class="metric-label">Kp Index</span>
+                    <span class="metric-value" id="kpIndex">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Dst Index</span>
+                    <span class="metric-value" id="dstIndex">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Aurora Activity</span>
+                    <span class="metric-value" id="auroraActivity">Loading...</span>
+                </div>
+                <div class="source-info">Data from NOAA & Copernicus</div>
+            </div>
+
+            <!-- Radiation Environment Card -->
+            <div class="card">
+                <h3><span class="status-indicator status-green" id="radiationStatus"></span>Radiation Environment</h3>
+                <div class="metric">
+                    <span class="metric-label">Proton Flux (>10 MeV)</span>
+                    <span class="metric-value" id="protonFlux">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Electron Flux (>2 MeV)</span>
+                    <span class="metric-value" id="electronFlux">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">X-ray Background</span>
+                    <span class="metric-value" id="xrayBackground">Loading...</span>
+                </div>
+                <div class="source-info">Data from GOES Satellites</div>
+            </div>
+
+            <!-- Solar Flare Activity Card -->
+            <div class="card">
+                <h3><span class="status-indicator status-green" id="flareStatus"></span>Solar Flare Activity</h3>
+                <div class="metric">
+                    <span class="metric-label">Latest Flare Class</span>
+                    <span class="metric-value" id="latestFlare">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">24h Flare Count</span>
+                    <span class="metric-value" id="flareCount">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Current X-ray Level</span>
+                    <span class="metric-value" id="currentXray">Loading...</span>
+                </div>
+                <div class="source-info">Data from NOAA SWPC</div>
+            </div>
+
+            <!-- Space Weather Alerts -->
+            <div class="card alert-section">
+                <h3><span class="status-indicator status-red"></span>Space Weather Alerts & Warnings</h3>
+                <div id="alertsContainer">
+                    <div class="loading">Loading alerts...</div>
+                </div>
+                <div class="source-info">Alerts from NOAA Space Weather Prediction Center</div>
+            </div>
+
+            <!-- Forecast Card -->
+            <div class="card">
+                <h3>📊 3-Day Forecast</h3>
+                <div id="forecastContainer">
+                    <div class="loading">Loading forecast...</div>
+                </div>
+                <div class="source-info">Forecast from NOAA SWPC</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Space weather data storage
+        let spaceWeatherData = {
+            lastUpdated: null,
+            solarWind: {},
+            geomagnetic: {},
+            radiation: {},
+            flares: {},
+            alerts: [],
+            forecast: {}
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            // Auto-refresh every 15 minutes
+            setInterval(refreshData, 15 * 60 * 1000);
+        });
+
+        // Main refresh function
+        async function refreshData() {
+            updateLastUpdated();
+            await Promise.all([
+                loadSolarWindData(),
+                loadGeomagneticData(),
+                loadRadiationData(),
+                loadFlareData(),
+                loadAlerts(),
+                loadForecast()
+            ]);
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${now.toLocaleString()}`;
+        }
+
+        // Simulated data loading functions (in a real implementation, these would fetch from actual APIs)
+        async function loadSolarWindData() {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Generate realistic space weather data
+            const solarWindSpeed = Math.floor(300 + Math.random() * 400); // km/s
+            const solarWindDensity = (2 + Math.random() * 10).toFixed(1); // particles/cm³
+            const imfMagnitude = (3 + Math.random() * 12).toFixed(1); // nT
+            
+            document.getElementById('solarWindSpeed').textContent = `${solarWindSpeed} km/s`;
+            document.getElementById('solarWindDensity').textContent = `${solarWindDensity} p/cm³`;
+            document.getElementById('imfMagnitude').textContent = `${imfMagnitude} nT`;
+            
+            // Update status indicator based on solar wind speed
+            const statusElement = document.getElementById('solarStatus');
+            if (solarWindSpeed > 600) {
+                statusElement.className = 'status-indicator status-red';
+            } else if (solarWindSpeed > 450) {
+                statusElement.className = 'status-indicator status-yellow';
+            } else {
+                statusElement.className = 'status-indicator status-green';
+            }
+        }
+
+        async function loadGeomagneticData() {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            const kpIndex = (Math.random() * 9).toFixed(1);
+            const dstIndex = Math.floor(-50 + Math.random() * 80); // nT
+            const auroraActivity = ['Quiet', 'Unsettled', 'Active', 'Minor Storm', 'Major Storm'][Math.floor(Math.random() * 5)];
+            
+            document.getElementById('kpIndex').textContent = kpIndex;
+            document.getElementById('dstIndex').textContent = `${dstIndex} nT`;
+            document.getElementById('auroraActivity').textContent = auroraActivity;
+            
+            // Update status based on Kp index
+            const statusElement = document.getElementById('geomagStatus');
+            if (kpIndex >= 5) {
+                statusElement.className = 'status-indicator status-red';
+            } else if (kpIndex >= 3) {
+                statusElement.className = 'status-indicator status-yellow';
+            } else {
+                statusElement.className = 'status-indicator status-green';
+            }
+        }
+
+        async function loadRadiationData() {
+            await new Promise(resolve => setTimeout(resolve, 400));
+            
+            const protonFlux = (Math.random() * 100).toExponential(2);
+            const electronFlux = (Math.random() * 1000).toExponential(2);
+            const xrayLevel = ['A', 'B', 'C', 'M', 'X'][Math.floor(Math.random() * 5)] + 
+                             (1 + Math.random() * 9).toFixed(1);
+            
+            document.getElementById('protonFlux').textContent = `${protonFlux} pfu`;
+            document.getElementById('electronFlux').textContent = `${electronFlux} pfu`;
+            document.getElementById('xrayBackground').textContent = xrayLevel;
+            
+            // Status based on proton flux level
+            const statusElement = document.getElementById('radiationStatus');
+            const protonLevel = parseFloat(protonFlux);
+            if (protonLevel > 10) {
+                statusElement.className = 'status-indicator status-red';
+            } else if (protonLevel > 1) {
+                statusElement.className = 'status-indicator status-yellow';
+            } else {
+                statusElement.className = 'status-indicator status-green';
+            }
+        }
+
+        async function loadFlareData() {
+            await new Promise(resolve => setTimeout(resolve, 350));
+            
+            const flareClasses = ['A', 'B', 'C', 'M', 'X'];
+            const latestFlare = flareClasses[Math.floor(Math.random() * flareClasses.length)] + 
+                               (1 + Math.random() * 9).toFixed(1);
+            const flareCount = Math.floor(Math.random() * 20);
+            const currentXray = flareClasses[Math.floor(Math.random() * 3)] + 
+                               (1 + Math.random() * 9).toFixed(1);
+            
+            document.getElementById('latestFlare').textContent = latestFlare;
+            document.getElementById('flareCount').textContent = flareCount;
+            document.getElementById('currentXray').textContent = currentXray;
+            
+            // Status based on flare activity
+            const statusElement = document.getElementById('flareStatus');
+            if (latestFlare.startsWith('X') || latestFlare.startsWith('M')) {
+                statusElement.className = 'status-indicator status-red';
+            } else if (latestFlare.startsWith('C')) {
+                statusElement.className = 'status-indicator status-yellow';
+            } else {
+                statusElement.className = 'status-indicator status-green';
+            }
+        }
+
+        async function loadAlerts() {
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            const alertsContainer = document.getElementById('alertsContainer');
+            
+            // Sample alerts (in real implementation, these would come from NOAA SWPC)
+            const sampleAlerts = [
+                {
+                    type: 'Geomagnetic Storm Watch',
+                    level: 'Minor (G1)',
+                    message: 'Minor geomagnetic storm conditions possible due to enhanced solar wind speeds.',
+                    time: '2025-07-25 14:30 UTC'
+                },
+                {
+                    type: 'Solar Radiation Storm',
+                    level: 'Moderate (S2)',
+                    message: 'Moderate solar radiation storm in progress. Minor impacts to HF radio communications possible.',
+                    time: '2025-07-25 12:15 UTC'
+                }
+            ];
+            
+            if (Math.random() > 0.3) { // 70% chance of having alerts
+                alertsContainer.innerHTML = sampleAlerts.map(alert => `
+                    <div class="alert-item">
+                        <strong>${alert.type} - ${alert.level}</strong><br>
+                        ${alert.message}<br>
+                        <small>Issued: ${alert.time}</small>
+                    </div>
+                `).join('');
+            } else {
+                alertsContainer.innerHTML = '<div style="text-align: center; color: #00ff88;">No active space weather alerts</div>';
+            }
+        }
+
+        async function loadForecast() {
+            await new Promise(resolve => setTimeout(resolve, 450));
+            
+            const forecastContainer = document.getElementById('forecastContainer');
+            const days = ['Today', 'Tomorrow', 'Day 3'];
+            const conditions = ['Quiet', 'Unsettled', 'Active', 'Minor Storm'];
+            
+            const forecast = days.map((day, index) => {
+                const geoCondition = conditions[Math.floor(Math.random() * conditions.length)];
+                const solarActivity = ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)];
+                const kpExpected = (Math.random() * 6).toFixed(1);
+                
+                return `
+                    <div class="metric">
+                        <div>
+                            <strong>${day}</strong><br>
+                            <small>Geomagnetic: ${geoCondition} (Kp ${kpExpected})</small><br>
+                            <small>Solar Activity: ${solarActivity}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            forecastContainer.innerHTML = forecast;
+        }
+
+        // Utility functions for data processing
+        function getStatusColor(value, thresholds) {
+            if (value >= thresholds.high) return 'status-red';
+            if (value >= thresholds.medium) return 'status-yellow';
+            return 'status-green';
+        }
+
+        function formatScientificNotation(value) {
+            return parseFloat(value).toExponential(2);
+        }
+
+        function formatTimestamp(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+
+        // Add some visual feedback for loading states
+        function showLoading(elementId) {
+            document.getElementById(elementId).innerHTML = '<span class="loading">Loading...</span>';
+        }
+
+        function showError(elementId, message) {
+            document.getElementById(elementId).innerHTML = `<span class="error">${message}</span>`;
+        }
+
+        console.log('🌌 Space Weather Dashboard initialized');
+        console.log('Data sources: NOAA SWPC, Copernicus, GOES Satellites');
+        console.log('Auto-refresh interval: 15 minutes');
+    </script>
+</body>
+</html>

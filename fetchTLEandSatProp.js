@@ -1,6 +1,6 @@
 import * as satellite from 'satellite.js';
 
-const fetchTLE = async () => {
+const fetchTLEandSatProp = async () => {
   try {
     const res = await fetch('https://celestrak.org/NORAD/elements/stations.txt');
     const text = await res.text();

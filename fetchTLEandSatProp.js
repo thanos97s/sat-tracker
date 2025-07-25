@@ -6,7 +6,7 @@ const fetchTLE = async () => {
     const text = await res.text();
 
     const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');
-    const TLESets = [];
+    const Sets = [];
     const now = new Date();
     
     for (let i = 0; i < TLELines.length; i += 3) {

@@ -27,7 +27,7 @@ const fetchTLE = async () => {
       
       // Validate TLE format before adding
       if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
-        TLESets.push({
+        Sets.push({
           name,
           tle1: line1,
           tle2: line2,
@@ -38,7 +38,7 @@ const fetchTLE = async () => {
       }
     }
 
-    return TLESets;
+    return Sets;
   } catch (error) {
     console.error('Error fetching TLE data:', error);
     return []; // Return empty array on error

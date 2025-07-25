@@ -1,13 +1,8 @@
-const sat_prop(tleSets) = async() => {
+const satProp(TLESets) = async() => {
 
 import * as satellite from 'satellite.js';
-const TLEData = await fetchTLE();
-const iss = TLEData.find(sat => sat.name.includes('ISS'));
+const iss = TLESets.find(sat => sat.name.includes('ISS'));
 
-
-  // Sample TLE
-var tleLine1 = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031',
-var tleLine2 = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869';
 
 // Initialize a satellite record
 var satrec = satellite.twoline2satrec(tleLine1, tleLine2); 

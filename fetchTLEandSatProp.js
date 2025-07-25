@@ -1,3 +1,5 @@
+import * as satellite from 'satellite.js';
+
 const fetchTLE = async () => {
   try {
     const res = await fetch('https://celestrak.org/NORAD/elements/stations.txt');
@@ -5,7 +7,8 @@ const fetchTLE = async () => {
 
     const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');
     const TLESets = [];
-
+    const now = new Date();
+    
     for (let i = 0; i < TLELines.length; i += 3) {
       // Skip if we don't have 3 lines to process
       if (i + 2 >= TLELines.length) break;
@@ -13,13 +16,24 @@ const fetchTLE = async () => {
       const name = TLELines[i].trim();
       const line1 = TLELines[i + 1].trim();
       const line2 = TLELines[i + 2].trim();
+      var satrec = satellite.twoline2satrec(line1, line2);
+      var positionAndVelocity = satellite.propagate(satrec, now);
+      const gmst = satellite.gstime(now);
+      const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
 
+      const longitude = satellite.degreesLong(positionGd.longitude);
+      const latitude = satellite.degreesLat(positionGd.latitude);
+      const altitude = positionGd.height;
+      
       // Validate TLE format before adding
       if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
         TLESets.push({
           name,
           tle1: line1,
-          tle2: line2
+          tle2: line2,
+          lon: longitude,
+          lat: latitude,
+          alt: altitude,
         });
       }
     }

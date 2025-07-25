@@ -3,20 +3,20 @@ const fetchTLE = async () => {
     const res = await fetch('https://celestrak.org/NORAD/elements/stations.txt');
     const text = await res.text();
 
-    const tleLines = text.trim().replace(/\r\n/g, '\n').split('\n');
-    const tleSets = [];
+    const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');
+    const TLESets = [];
 
-    for (let i = 0; i < tleLines.length; i += 3) {
+    for (let i = 0; i < TLELines.length; i += 3) {
       // Skip if we don't have 3 lines to process
-      if (i + 2 >= tleLines.length) break;
+      if (i + 2 >= TLELines.length) break;
       
-      const name = tleLines[i].trim();
-      const line1 = tleLines[i + 1].trim();
-      const line2 = tleLines[i + 2].trim();
+      const name = TLELines[i].trim();
+      const line1 = TLELines[i + 1].trim();
+      const line2 = TLELines[i + 2].trim();
 
       // Validate TLE format before adding
       if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
-        tleSets.push({
+        TLESets.push({
           name,
           tle1: line1,
           tle2: line2
@@ -24,7 +24,7 @@ const fetchTLE = async () => {
       }
     }
 
-    return tleSets;
+    return TLESets;
   } catch (error) {
     console.error('Error fetching TLE data:', error);
     return []; // Return empty array on error

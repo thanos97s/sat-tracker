@@ -1,17 +1,4 @@
-        // Process the satellite data to add satrec for each satellite
-        // Your module already provides: name, tle1, tle2, lon, lat, alt (alt is already in meters)
-        satellites = satellites.map(sat => {
-          try {
-            const satrec = satellite.twoline2satrec(sat.tle1, sat.tle2);
-            return {
-              ...sat,
-              satrec: satrec
-            };
-          } catch (e) {
-            console.warn(`Error creating satrec for ${sat.name}:`, e);
-            return sat;
-          }
-        }).filter(sat => sat.satrec); // Only keep satellites with valid satrec<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -96,18 +83,69 @@
   </div>
 
   <div id="controls">
-    <button onclick="togglePaths()">Toggle Paths</button>
+    <button onclick="toggleOrbits()">Toggle Orbits</button>
     <button onclick="toggleLabels()">Toggle Labels</button>
-    <button onclick="viewAll()">View All</button>
+    <button onclick="viewEarth()">Earth View</button>
     <div style="margin-top: 10px; font-size: 11px;">
-      <div>Updates every 30 seconds</div>
+      <div>Updates every 10 seconds</div>
       <div id="lastUpdate"></div>
     </div>
   </div>
   
-  <script type="module">
-    // Import the TLE fetching function from your module
-    import fetchTLEandSatProp from './fetchTLEandSatProp.js';
+  <script>
+    // Inline TLE fetcher to avoid module issues
+    const fetchTLEandSatProp = async () => {
+      try {
+        const res = await fetch('https://celestrak.org/NORAD/elements/stations.txt');
+        const text = await res.text();
+
+        const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');
+        const Sets = [];
+        const now = new Date();
+        
+        for (let i = 0; i < TLELines.length; i += 3) {
+          if (i + 2 >= TLELines.length) break;
+          
+          const name = TLELines[i].trim();
+          const line1 = TLELines[i + 1].trim();
+          const line2 = TLELines[i + 2].trim();
+          
+          // Validate TLE format
+          if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
+            try {
+              const satrec = satellite.twoline2satrec(line1, line2);
+              const positionAndVelocity = satellite.propagate(satrec, now);
+              
+              if (positionAndVelocity.position) {
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitude = positionGd.height * 1000; // Convert km to meters
+                
+                Sets.push({
+                  name,
+                  tle1: line1,
+                  tle2: line2,
+                  lon: longitude,
+                  lat: latitude,
+                  alt: altitude,
+                  satrec: satrec
+                });
+              }
+            } catch (e) {
+              console.warn(`Error processing satellite ${name}:`, e);
+            }
+          }
+        }
+
+        return Sets;
+      } catch (error) {
+        console.error('Error fetching TLE data:', error);
+        return [];
+      }
+    };
 
     // Set Cesium Ion access token
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjkzOTNjYy0xOGI4LTQ1M2QtOTNiOS0zNTM2OTFiMTg4MTQiLCJpZCI6MzIyMTQ3LCJpYXQiOjE3NTI2OTQ5ODV9.c5dy8PXgAJzN1kAyAjZ03WzqxgEYpS2mAJB6qU0Yq3U';
@@ -125,12 +163,12 @@
       vrButton: false
     });
 
-    // Set initial camera position to view the whole Earth
+    // Set Earth-centered view
     viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(0, 0, 15000000), // 15,000 km altitude
+      destination: Cesium.Cartesian3.fromDegrees(0, 0, 12000000), // 12,000 km altitude
       orientation: {
         heading: 0.0,
-        pitch: Cesium.Math.toRadians(-90), // Look down at Earth
+        pitch: Cesium.Math.toRadians(-20), // Slight angle to see the curve
         roll: 0.0
       }
     });
@@ -138,7 +176,8 @@
     // Global variables
     let satellites = [];
     let satelliteEntities = [];
-    let showPaths = true;
+    let orbitEntities = [];
+    let showOrbits = true;
     let showLabels = true;
 
     // Color palette for different satellites
@@ -150,14 +189,44 @@
       Cesium.Color.ORANGE,
       Cesium.Color.LIGHTBLUE,
       Cesium.Color.PINK,
-      Cesium.Color.LIGHTGREEN
+      Cesium.Color.LIGHTGREEN,
+      Cesium.Color.RED,
+      Cesium.Color.WHITE
     ];
 
-    // Function to create satellite entity
+    // Function to calculate orbit points
+    function calculateOrbitPoints(satrec, startTime, numPoints = 180) {
+      const points = [];
+      const period = 2 * Math.PI / satrec.no; // Orbital period in minutes
+      const timeStep = (period / numPoints) * 60 * 1000; // Convert to milliseconds
+      
+      for (let i = 0; i < numPoints; i++) {
+        const time = new Date(startTime.getTime() + i * timeStep);
+        try {
+          const positionAndVelocity = satellite.propagate(satrec, time);
+          if (positionAndVelocity.position) {
+            const gmst = satellite.gstime(time);
+            const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+            
+            const longitude = satellite.degreesLong(positionGd.longitude);
+            const latitude = satellite.degreesLat(positionGd.latitude);
+            const altitude = positionGd.height * 1000; // Convert to meters
+            
+            points.push(Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude));
+          }
+        } catch (e) {
+          // Skip invalid points
+        }
+      }
+      return points;
+    }
+
+    // Function to create satellite entity with orbit
     function createSatelliteEntity(satData, index) {
       const color = colors[index % colors.length];
       const position = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, satData.alt);
       
+      // Create satellite point
       const entity = viewer.entities.add({
         name: satData.name,
         position: position,
@@ -177,16 +246,24 @@
           outlineWidth: 2,
           style: Cesium.LabelStyle.FILL_AND_OUTLINE,
           show: showLabels
-        },
-        path: {
-          resolution: 120,
-          material: color.withAlpha(0.6),
-          width: 2,
-          leadTime: 0,
-          trailTime: 5400, // 90 minutes trail
-          show: showPaths
         }
       });
+
+      // Create orbit polyline
+      const orbitPoints = calculateOrbitPoints(satData.satrec, new Date());
+      if (orbitPoints.length > 0) {
+        const orbitEntity = viewer.entities.add({
+          name: `${satData.name} Orbit`,
+          polyline: {
+            positions: orbitPoints,
+            width: 2,
+            material: color.withAlpha(0.7),
+            clampToGround: false,
+            show: showOrbits
+          }
+        });
+        orbitEntities.push(orbitEntity);
+      }
 
       return entity;
     }
@@ -200,7 +277,7 @@
           try {
             const positionAndVelocity = satellite.propagate(satData.satrec, now);
             
-            if (positionAndVelocity.position && positionAndVelocity.velocity) {
+            if (positionAndVelocity.position) {
               const gmst = satellite.gstime(now);
               const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
 
@@ -214,7 +291,7 @@
               // Update satellite data
               satData.lon = longitude;
               satData.lat = latitude;
-              satData.alt = altitude; // Already in meters
+              satData.alt = altitude;
             }
           } catch (e) {
             console.warn(`Error updating ${satData.name}:`, e);
@@ -224,6 +301,20 @@
 
       document.getElementById('lastUpdate').textContent = `Last: ${now.toLocaleTimeString()}`;
       updateSatelliteList();
+    }
+
+    // Function to update orbit positions (every few minutes)
+    function updateOrbits() {
+      const now = new Date();
+      
+      satellites.forEach((satData, index) => {
+        if (satData.satrec && orbitEntities[index]) {
+          const orbitPoints = calculateOrbitPoints(satData.satrec, now);
+          if (orbitPoints.length > 0) {
+            orbitEntities[index].polyline.positions = orbitPoints;
+          }
+        }
+      });
     }
 
     // Function to update satellite list display
@@ -252,7 +343,7 @@
       if (satelliteEntities[index]) {
         const sat = satellites[index];
         viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(sat.lon, sat.lat, sat.alt + 500000),
+          destination: Cesium.Cartesian3.fromDegrees(sat.lon, sat.lat, sat.alt + 1000000),
           orientation: {
             heading: Cesium.Math.toRadians(0.0),
             pitch: Cesium.Math.toRadians(-45.0),
@@ -263,10 +354,10 @@
     }
 
     // Control functions
-    window.togglePaths = function() {
-      showPaths = !showPaths;
-      satelliteEntities.forEach(entity => {
-        if (entity.path) entity.path.show = showPaths;
+    window.toggleOrbits = function() {
+      showOrbits = !showOrbits;
+      orbitEntities.forEach(entity => {
+        if (entity.polyline) entity.polyline.show = showOrbits;
       });
     };
 
@@ -277,20 +368,16 @@
       });
     };
 
-    window.viewAll = function() {
-      if (satellites.length > 0) {
-        const positions = satellites.map(sat => 
-          Cesium.Cartesian3.fromDegrees(sat.lon, sat.lat, sat.alt)
-        );
-        
-        viewer.camera.flyTo({
-          destination: Cesium.BoundingSphere.fromPoints(positions).center,
-          orientation: {
-            heading: 0,
-            pitch: Cesium.Math.toRadians(-90),
-          }
-        });
-      }
+    window.viewEarth = function() {
+      viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(0, 0, 12000000),
+        orientation: {
+          heading: 0.0,
+          pitch: Cesium.Math.toRadians(-20),
+          roll: 0.0
+        },
+        duration: 3.0
+      });
     };
 
     // Initialize the application
@@ -314,17 +401,12 @@
           satelliteEntities.push(entity);
         });
 
-        // Find ISS but don't auto-fly to it, let user stay in global view
-        const issIndex = satellites.findIndex(sat => sat.name.includes('ISS'));
-        if (issIndex !== -1) {
-          console.log(`ISS found at index ${issIndex}: ${satellites[issIndex].name}`);
-        }
-
         // Update satellite list
         updateSatelliteList();
 
-        // Set up periodic updates every 30 seconds
-        setInterval(updateSatellitePositions, 30000);
+        // Set up periodic updates
+        setInterval(updateSatellitePositions, 10000); // Every 10 seconds
+        setInterval(updateOrbits, 300000); // Every 5 minutes
         
       } catch (error) {
         console.error('Initialization error:', error);
@@ -337,9 +419,11 @@
     viewer.scene.globe.enableLighting = true;
     viewer.scene.postProcessStages.fxaa.enabled = true;
 
-    // Add buildings
+    // Add buildings for reference
     Cesium.createOsmBuildingsAsync().then(tileset => {
       viewer.scene.primitives.add(tileset);
+    }).catch(e => {
+      console.log('Buildings not available:', e);
     });
 
     // Start the application

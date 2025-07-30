@@ -419,13 +419,6 @@
     viewer.scene.globe.enableLighting = true;
     viewer.scene.postProcessStages.fxaa.enabled = true;
 
-    // Add buildings for reference
-    Cesium.createOsmBuildingsAsync().then(tileset => {
-      viewer.scene.primitives.add(tileset);
-    }).catch(e => {
-      console.log('Buildings not available:', e);
-    });
-
     // Start the application
     initialize();
   </script>

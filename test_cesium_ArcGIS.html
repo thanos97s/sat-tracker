@@ -12,6 +12,17 @@
 </head>
 <body>
   <div id="cesiumContainer"></div>
+
+  <div id="controls">
+    <button onclick="toggleOrbits()">Toggle Orbits</button>
+    <button onclick="toggleLabels()">Toggle Labels</button>
+    <button onclick="viewEarth()">Earth View</button>
+    <div style="margin-top: 10px; font-size: 11px;">
+      <div>Updates every 10 seconds</div>
+      <div id="lastUpdate"></div>
+    </div>
+  </div>
+  
   <script>
     const fetchTLEandSatProp = async () => {
       try {

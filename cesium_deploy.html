@@ -404,7 +404,7 @@
         updateSatelliteList();
 
         // Set up periodic updates
-        setInterval(updateSatellitePositions, 10000); // Every 10 seconds
+        setInterval(updateSatellitePositions, 60000); // Every 1 minute
         setInterval(updateOrbits, 300000); // Every 5 minutes
         
       } catch (error) {

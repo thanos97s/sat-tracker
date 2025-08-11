@@ -102,7 +102,7 @@
       }
       });
         
-     // Global variables
+    // Global variables
     let satellites = [];
     let satelliteEntities = [];
     let orbitEntities = [];
@@ -334,7 +334,7 @@
         updateSatelliteList();
 
         // Set up periodic updates
-        setInterval(updateSatellitePositions, 120000); // Every 2 min
+        setInterval(updateSatellitePositions, 10000); // Every 10 seconds
         setInterval(updateOrbits, 300000); // Every 5 minutes
         
       } catch (error) {
@@ -343,9 +343,13 @@
       }
     }
 
+    // Add visual enhancements
+    viewer.scene.skyAtmosphere.show = true;
+    viewer.scene.globe.enableLighting = true;
+    viewer.scene.postProcessStages.fxaa.enabled = true;
+
     // Start the application
     initialize();
-    
   </script>
 </body>
 </html>

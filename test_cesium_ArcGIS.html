@@ -9,7 +9,80 @@
 
   <!-- Include satellite.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/6.0.1/satellite.min.js"></script>
+
+  <style>
+    html, body, #cesiumContainer {
+      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+    }
+    
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(48, 51, 54, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+      font-family: sans-serif;
+      z-index: 1000;
+    }
+    
+    #controls button {
+      margin: 2px;
+      padding: 5px 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    #controls button:hover {
+      background: #45a049;
+    }
+    
+    #status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #ccc;
+    }
+    
+    #satelliteList {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 250px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: rgba(48, 51, 54, 0.9);
+      border-radius: 5px;
+      padding: 10px;
+      color: white;
+      font-family: sans-serif;
+      font-size: 12px;
+      z-index: 1000;
+    }
+    
+    .satellite-item {
+      padding: 8px;
+      margin: 5px 0;
+      background: rgba(76, 175, 80, 0.2);
+      border-radius: 3px;
+      cursor: pointer;
+      border-left: 3px solid #4CAF50;
+    }
+    
+    .satellite-item:hover {
+      background: rgba(76, 175, 80, 0.4);
+    }
+    
+    .satellite-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+  </style>
 </head>
+  
 <body>
   <div id="cesiumContainer"></div>
 
@@ -17,7 +90,7 @@
     <button onclick="toggleOrbits()">Toggle Orbits</button>
     <button onclick="toggleLabels()">Toggle Labels</button>
     <button onclick="viewEarth()">Earth View</button>
-    <div style="margin-top: 10px; font-size: 11px;">
+    <div style="margin-top: 30px; font-size: 11px;">
       <div>Updates every 1 minute</div>
       <div id="lastUpdate"></div>
     </div>

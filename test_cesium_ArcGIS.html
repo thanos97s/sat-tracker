@@ -419,7 +419,9 @@
     // Add visual enhancements
     viewer.scene.skyAtmosphere.show = true;
     viewer.scene.globe.enableLighting = true;
-    viewer.scene.postProcessStages.fxaa.enabled = true;
+    if (viewer.scene.postProcessStages) {
+      viewer.scene.postProcessStages.fxaa.enabled = true;
+    }
 
     // Start the application
     initialize();

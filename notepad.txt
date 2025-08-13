@@ -7,3 +7,6 @@ https://github.com/dsuarezv/satellite-tracker
 
 ArcGIS - Cesium Integration
 https://sandcastle.cesium.com/?src=ArcGIS%20MapServer.html
+
+SWPC NOAA Scales
+https://services.swpc.noaa.gov/products/noaa-scales.json

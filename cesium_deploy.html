@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Space Station Tracker</title>
+  <title>Space NOAA</title>
   <!-- Include the CesiumJS JavaScript and CSS files -->
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
@@ -96,7 +96,7 @@
     // Inline TLE fetcher to avoid module issues
     const fetchTLEandSatProp = async () => {
       try {
-        const res = await fetch('https://celestrak.org/NORAD/elements/stations.txt');
+        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle');
         const text = await res.text();
 
         const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');

@@ -96,7 +96,7 @@
     // Inline TLE fetcher to avoid module issues
     const fetchTLEandSatProp = async () => {
       try {
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle');
+        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle');
         const text = await res.text();
 
         const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');

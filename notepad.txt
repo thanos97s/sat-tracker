@@ -10,3 +10,14 @@ https://sandcastle.cesium.com/?src=ArcGIS%20MapServer.html
 
 SWPC NOAA Scales
 https://services.swpc.noaa.gov/products/noaa-scales.json
+
+
+entities.add({
+    position: Cesium.Cartesian3.fromDegrees(-65.0, 35.0),
+    ellipse: {
+      semiMinorAxis: 200000.0,
+      semiMajorAxis: 200000.0,
+      height: height,
+      material: Cesium.Color.fromRandom({ alpha: 0.5 }),
+    },
+  });

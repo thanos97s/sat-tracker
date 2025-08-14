@@ -93,7 +93,44 @@
   </div>
   
   <script>
-    // Inline TLE fetcher to avoid module issues
+   
+
+    // Set Cesium Ion access token
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjkzOTNjYy0xOGI4LTQ1M2QtOTNiOS0zNTM2OTFiMTg4MTQiLCJpZCI6MzIyMTQ3LCJpYXQiOjE3NTI2OTQ5ODV9.c5dy8PXgAJzN1kAyAjZ03WzqxgEYpS2mAJB6qU0Yq3U';
+
+    //ArcGis Access Token
+    Cesium.ArcGisMapService.defaultAccessToken = 'AAPTxy8BH1VEsoebNVZXo8HurI6cJfJajry8XPl9zp46kC231QWCRVgtAoRG7lCczc-ERxWztOcgP3LadTYNUGwABUW-9PftIU9Foum_L15v82y2QsKEqFXSt2CUbmAhSwlwFtv-WuYRqPVx1LAMBKj_xwnQbn9ETuT3X8eh3AkjS8IZnNvlAcNU2-NTVdbJO6QIS83w-w_ia56cNifVYP0MWi2873Bh9bkOk5HWNB_HoQc.AT1_PJW9ifSN';
+    
+    // Initialize Cesium Viewer
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      //timeline: false,
+      //animation: false,
+      //sceneModePicker: false,
+      //baseLayerPicker: false,
+      //navigationHelpButton: false,
+      //fullscreenButton: false,
+      //vrButton: false
+    });
+
+    // Set Earth-centered view
+    viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(0, 0, 12000000), // 12,000 km altitude
+      orientation: {
+        heading: 0.0,
+        pitch: Cesium.Math.toRadians(-20), // Slight angle to see the curve
+        roll: 0.0
+      }
+    });
+
+    // Global variables
+    let satellites = [];
+    let satelliteEntities = [];
+    let orbitEntities = [];
+    let showOrbits = true;
+    let showLabels = true;
+
+     // Inline TLE fetcher to avoid module issues
     const fetchTLEandSatProp = async () => {
       try {
         const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle');
@@ -146,42 +183,7 @@
         return [];
       }
     };
-
-    // Set Cesium Ion access token
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjkzOTNjYy0xOGI4LTQ1M2QtOTNiOS0zNTM2OTFiMTg4MTQiLCJpZCI6MzIyMTQ3LCJpYXQiOjE3NTI2OTQ5ODV9.c5dy8PXgAJzN1kAyAjZ03WzqxgEYpS2mAJB6qU0Yq3U';
-
-    //ArcGis Access Token
-    Cesium.ArcGisMapService.defaultAccessToken = 'AAPTxy8BH1VEsoebNVZXo8HurI6cJfJajry8XPl9zp46kC231QWCRVgtAoRG7lCczc-ERxWztOcgP3LadTYNUGwABUW-9PftIU9Foum_L15v82y2QsKEqFXSt2CUbmAhSwlwFtv-WuYRqPVx1LAMBKj_xwnQbn9ETuT3X8eh3AkjS8IZnNvlAcNU2-NTVdbJO6QIS83w-w_ia56cNifVYP0MWi2873Bh9bkOk5HWNB_HoQc.AT1_PJW9ifSN';
     
-    // Initialize Cesium Viewer
-    const viewer = new Cesium.Viewer('cesiumContainer', {
-      terrain: Cesium.Terrain.fromWorldTerrain(),
-      //timeline: false,
-      //animation: false,
-      //sceneModePicker: false,
-      //baseLayerPicker: false,
-      //navigationHelpButton: false,
-      //fullscreenButton: false,
-      //vrButton: false
-    });
-
-    // Set Earth-centered view
-    viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(0, 0, 12000000), // 12,000 km altitude
-      orientation: {
-        heading: 0.0,
-        pitch: Cesium.Math.toRadians(-20), // Slight angle to see the curve
-        roll: 0.0
-      }
-    });
-
-    // Global variables
-    let satellites = [];
-    let satelliteEntities = [];
-    let orbitEntities = [];
-    let showOrbits = true;
-    let showLabels = true;
-
     // Color palette for different satellites
     const colors = [
       Cesium.Color.YELLOW,

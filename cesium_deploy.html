@@ -231,7 +231,7 @@
       const color = colors[index % colors.length];
       const position = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, satData.alt);
       const positionView = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, 10000);
-      const radius = Math.tan(Math.PI/6)*satData.alt;
+      const radius = Math.tan(Math.PI/12)*satData.alt;
       
       // Create satellite point
       const satEntity = viewer.entities.add({

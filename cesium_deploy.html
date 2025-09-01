@@ -232,6 +232,7 @@
       const position = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, satData.alt);
       const positionView = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, 10000);
       const radius = Math.tan(Math.PI/12)*satData.alt;
+      const viewrad = 0.81023067
       
       // Create satellite point
       const satEntity = viewer.entities.add({
@@ -258,7 +259,7 @@
 
         // Create satellite viewing area
       const viewEntity = viewer.entities.add({
-        name: `${satData.name} View`,
+        name: `${satData.name} Field of View`,
         position: positionView,
         ellipse: {
           semiMinorAxis: radius,
@@ -267,8 +268,20 @@
           outlineColor: Cesium.Color.BLACK,
           outlineWidth: 1,
         },
-        
-        
+      });
+
+        const viewEntity2 = viewer.entities.add({
+        name: `${satData.name} Vision`,
+        position: positionView,
+        rectangle: {
+          coordinates: Cesium.Rectangle.fromDegrees(satData.lon-viewrad, satData.lat-viewrad, satData.lon+viewrad, satData.lat+viewrad),
+          semiMinorAxis: radius,
+          semiMajorAxis: radius,
+          material: color.withAlpha(0.7),
+          outlineColor: Cesium.Color.BLACK,
+          outlineWidth: 1,
+        },
+         
       });
 
       // Create orbit polyline

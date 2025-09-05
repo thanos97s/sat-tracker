@@ -127,6 +127,7 @@
     let satellites = [];
     let satelliteEntities = [];
     let visionEntities = [];
+    let vision2Entities = [];
     let orbitEntities = [];
     let showOrbits = true;
     let showLabels = true;
@@ -300,7 +301,7 @@
         orbitEntities.push(orbitEntity);
       }
 
-      return [satEntity, viewEntity];
+      return [satEntity, viewEntity, viewEntity2];
     }
 
     // Function to update satellite positions
@@ -324,6 +325,7 @@
               const position2 = Cesium.Cartesian3.fromDegrees(longitude, latitude);
               satelliteEntities[index].position = position;
               visionEntities[index].position = position2;
+              vision2Entities[index].position = position2;
 
               // Update satellite data
               satData.lon = longitude;
@@ -434,9 +436,10 @@
         
         // Create entities for all satellites
         satellites.forEach((sat, index) => {
-          const [satEntity, viewEntity] = createSatelliteEntity(sat, index);
+          const [satEntity, viewEntity, viewEntity2] = createSatelliteEntity(sat, index);
           satelliteEntities.push(satEntity);
           visionEntities.push(viewEntity);
+          vision2Entities.push(viewEntity2);
         });
 
         // Update satellite list

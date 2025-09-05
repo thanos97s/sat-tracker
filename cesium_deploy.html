@@ -232,7 +232,7 @@
       const position = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, satData.alt);
       const positionView = Cesium.Cartesian3.fromDegrees(satData.lon, satData.lat, 10000);
       const radius = Math.tan(Math.PI/12)*satData.alt;
-      const viewrad = 0.81023067/2;
+      const viewrad = 0.06363636363;
       
       // Create satellite point
       const satEntity = viewer.entities.add({

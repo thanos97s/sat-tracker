@@ -271,7 +271,7 @@
         },
       });
 
-        const viewEntity2 = viewer.entities.add({
+        const view2Entity = viewer.entities.add({
         name: `${satData.name} Vision`,
         position: positionView,
         rectangle: {
@@ -301,7 +301,7 @@
         orbitEntities.push(orbitEntity);
       }
 
-      return [satEntity, viewEntity, viewEntity2];
+      return [satEntity, viewEntity, view2Entity];
     }
 
     // Function to update satellite positions

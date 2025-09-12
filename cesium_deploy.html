@@ -265,7 +265,7 @@
         ellipse: {
           semiMinorAxis: radius,
           semiMajorAxis: radius,
-          material: color.withAlpha(0.3),
+          material: color.withAlpha(0.2),
           outlineColor: Cesium.Color.BLACK,
           outlineWidth: 1,
         },
@@ -278,9 +278,9 @@
           coordinates: Cesium.Rectangle.fromDegrees(satData.lon-viewrad, satData.lat-viewrad, satData.lon+viewrad, satData.lat+viewrad),
           semiMinorAxis: radius,
           semiMajorAxis: radius,
-          material: color.withAlpha(0.7),
+          material: color.withAlpha(0.8),
           outlineColor: Cesium.Color.BLACK,
-          outlineWidth: 1,
+          outlineWidth: 2,
         },
          
       });

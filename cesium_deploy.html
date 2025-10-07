@@ -425,6 +425,11 @@
       });
     };
 
+    window.confirmInput = function() {
+      const TLE = document.getElementById('inputBox').value;
+      viewer.entities.removeAll();
+    };
+    
     // Initialize the application
     async function initialize() {
       document.getElementById('status').textContent = 'Fetching TLE data...';

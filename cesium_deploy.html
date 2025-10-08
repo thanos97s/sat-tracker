@@ -428,6 +428,12 @@
     window.confirmInput = function() {
       const TLE = document.getElementById('inputBox').value;
       viewer.entities.removeAll();
+
+      let satellites = [];
+      let satelliteEntities = [];
+      let visionEntities = [];
+      let vision2Entities = [];
+      let orbitEntities = [];
       
       const TLELines = TLE.trim().replace(/\r\n/g, '\n').split('\n');
       const Sets = [];
@@ -466,6 +472,9 @@
       }
 
       const [satEntity, viewEntity, viewEntity2] = createSatelliteEntity(Sets, 1);
+      satelliteEntities.push(satEntity);
+      visionEntities.push(viewEntity);
+      vision2Entities.push(viewEntity2);
       
     };
     

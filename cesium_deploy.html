@@ -428,6 +428,45 @@
     window.confirmInput = function() {
       const TLE = document.getElementById('inputBox').value;
       viewer.entities.removeAll();
+      
+      const TLELines = TLE.trim().replace(/\r\n/g, '\n').split('\n');
+      const Sets = [];
+      const now = new Date();
+
+      const name = TLELines[i].trim();
+      const line1 = TLELines[i + 1].trim();
+      const line2 = TLELines[i + 2].trim();
+
+      if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
+            try {
+              const satrec = satellite.twoline2satrec(line1, line2);
+              const positionAndVelocity = satellite.propagate(satrec, now);
+              
+              if (positionAndVelocity.position) {
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitude = positionGd.height * 1000; // Convert km to meters
+                
+                Sets.push({
+                  name,
+                  tle1: line1,
+                  tle2: line2,
+                  lon: longitude,
+                  lat: latitude,
+                  alt: altitude,
+                  satrec: satrec
+            });
+          }
+        } catch (e) {
+          console.warn(`Error processing satellite ${name}:`, e);
+        }
+      }
+
+      const [satEntity, viewEntity, viewEntity2] = createSatelliteEntity(Sets, 1);
+      
     };
     
     // Initialize the application

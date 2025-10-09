@@ -456,7 +456,7 @@
                 const latitude = satellite.degreesLat(positionGd.latitude);
                 const altitude = positionGd.height * 1000; // Convert km to meters
                 
-                Sets.push({
+                satellites.push({
                   name,
                   tle1: line1,
                   tle2: line2,
@@ -471,7 +471,7 @@
         }
       }
 
-      const [satEntity, viewEntity, viewEntity2] = createSatelliteEntity(Sets, 1);
+      const [satEntity, viewEntity, viewEntity2] = createSatelliteEntity(satellites, 1);
       satelliteEntities.push(satEntity);
       visionEntities.push(viewEntity);
       vision2Entities.push(viewEntity2);

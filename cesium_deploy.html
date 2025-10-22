@@ -426,77 +426,77 @@
     };
 
     window.confirmInput = function() {
-      const TLE = document.getElementById('inputBox').value.trim();
+  const TLE = document.getElementById('inputBox').value.trim();
   
-      if (!TLE) {
-        alert('Please enter TLE data');
-        return;
-      }
+  if (!TLE) {
+    alert('Please enter TLE data');
+    return;
+  }
   
-      // Clear all existing entities
-      viewer.entities.removeAll();
+  // Clear all existing entities
+  viewer.entities.removeAll();
 
-      // Reset global arrays
-      satellites = [];
-      satelliteEntities = [];
-      visionEntities = [];
-      vision2Entities = [];
-      orbitEntities = [];
+  // Reset global arrays
+  satellites = [];
+  satelliteEntities = [];
+  visionEntities = [];
+  vision2Entities = [];
+  orbitEntities = [];
   
-      const TLELines = TLE.replace(/\r\n/g, '\n').split('\n');
-      const now = new Date();
+  const TLELines = TLE.replace(/\r\n/g, '\n').split('\n');
+  const now = new Date();
 
   // Check if we have at least 3 lines
-      if (TLELines.length < 3) {
-        alert('Invalid TLE format. Need at least 3 lines per satellite: name, line1, line2');
-        return;
-      }
+  if (TLELines.length < 3) {
+    alert('Invalid TLE format. Need at least 3 lines per satellite: name, line1, line2');
+    return;
+  }
 
-      let successCount = 0;
-      let errorCount = 0;
+  let successCount = 0;
+  let errorCount = 0;
 
-      // Process TLEs in groups of 3 lines
-      for (let i = 0; i < TLELines.length; i += 3) {
-        if (i + 2 >= TLELines.length) break;
+  // Process TLEs in groups of 3 lines
+  for (let i = 0; i < TLELines.length; i += 3) {
+    if (i + 2 >= TLELines.length) break;
     
-      const name = TLELines[i].trim();
-      const line1 = TLELines[i + 1].trim();
-      const line2 = TLELines[i + 2].trim();
+    const name = TLELines[i].trim();
+    const line1 = TLELines[i + 1].trim();
+    const line2 = TLELines[i + 2].trim();
 
-      // Validate TLE format
-      if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
-        try {
-          const satrec = satellite.twoline2satrec(line1, line2);
-          const positionAndVelocity = satellite.propagate(satrec, now);
+    // Validate TLE format
+    if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
+      try {
+        const satrec = satellite.twoline2satrec(line1, line2);
+        const positionAndVelocity = satellite.propagate(satrec, now);
         
-          if (positionAndVelocity.position) {
-            const gmst = satellite.gstime(now);
-            const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+        if (positionAndVelocity.position) {
+          const gmst = satellite.gstime(now);
+          const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
 
-            const longitude = satellite.degreesLong(positionGd.longitude);
-            const latitude = satellite.degreesLat(positionGd.latitude);
-            const altitude = positionGd.height * 1000; // Convert km to meters
+          const longitude = satellite.degreesLong(positionGd.longitude);
+          const latitude = satellite.degreesLat(positionGd.latitude);
+          const altitude = positionGd.height * 1000; // Convert km to meters
           
-            const satData = {
-              name: name,
-              tle1: line1,
-              tle2: line2,
-              lon: longitude,
-              lat: latitude,
-              alt: altitude,
-              satrec: satrec
-            };
+          const satData = {
+            name: name,
+            tle1: line1,
+            tle2: line2,
+            lon: longitude,
+            lat: latitude,
+            alt: altitude,
+            satrec: satrec
+          };
           
-            satellites.push(satData);
+          satellites.push(satData);
           
-            // Create entities for the satellite
-            const [satEntity, viewEntity, view2Entity] = createSatelliteEntity(satData, satellites.length - 1);
-            satelliteEntities.push(satEntity);
-            visionEntities.push(viewEntity);
-            vision2Entities.push(view2Entity);
+          // Create entities for the satellite
+          const [satEntity, viewEntity, view2Entity] = createSatelliteEntity(satData, satellites.length - 1);
+          satelliteEntities.push(satEntity);
+          visionEntities.push(viewEntity);
+          vision2Entities.push(view2Entity);
           
-            successCount++;
-          } else {
+          successCount++;
+        } else {
           console.warn(`Could not propagate position for ${name}`);
           errorCount++;
         }

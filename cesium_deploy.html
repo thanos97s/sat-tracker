@@ -138,29 +138,29 @@
      // Inline TLE fetcher to avoid module issues
     const fetchTLEandSatProp = async () => {
       try {
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=TURKSAT&FORMAT=tle');
-        const text = await res.text();
+        let res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=TURKSAT&FORMAT=tle');
+        let text = await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=CONNECTA&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=CONNECTA&FORMAT=tle');
+        text += await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=GOKTURK&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=GOKTURK&FORMAT=tle');
+        text += await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=BILSAT&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=BILSAT&FORMAT=tle');
+        text += await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=IMECE&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=IMECE&FORMAT=tle');
+        text += await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=ITUPSAT&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=ITUPSAT&FORMAT=tle');
+        text += await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=PAUSAT-1&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=PAUSAT-1&FORMAT=tle');
+        text += await res.text();
 
-        const res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=RASAT&FORMAT=tle');
-        const text += await res.text();
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=RASAT&FORMAT=tle');
+        text += await res.text();
         
         const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');
         const Sets = [];

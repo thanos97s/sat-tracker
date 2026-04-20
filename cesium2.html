@@ -488,6 +488,7 @@
               // Create entities for the satellite
               const [satEntity, viewEntity] = createSatelliteEntity(satData, satellites.length - 1);
               satelliteEntities.push(satEntity);
+              if (satData.alt < 20000000)
               visionEntities.push(viewEntity);
 
           

@@ -488,9 +488,9 @@
               // Create entities for the satellite
               const [satEntity, viewEntity] = createSatelliteEntity(satData, satellites.length - 1);
               satelliteEntities.push(satEntity);
-              if (satData.alt < 20000000)
-              visionEntities.push(viewEntity);
-
+              if (satData.alt < 20000000) {
+                visionEntities.push(viewEntity);
+              }
           
               successCount++;
             } else {
@@ -546,10 +546,11 @@
         
         // Create entities for all satellites
         satellites.forEach((sat, index) => {
-          const [satEntity, viewEntity, view2Entity] = createSatelliteEntity(sat, index);
+          const [satEntity, viewEntity] = createSatelliteEntity(sat, index);
           satelliteEntities.push(satEntity);
-          visionEntities.push(viewEntity);
-
+          if (satData.alt < 20000000) {
+            visionEntities.push(viewEntity);
+          }
         });
 
         // Update satellite list

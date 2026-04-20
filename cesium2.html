@@ -130,7 +130,6 @@
     let satellites = [];
     let satelliteEntities = [];
     let visionEntities = [];
-    let vision2Entities = [];
     let orbitEntities = [];
     let showOrbits = true;
     let showLabels = true;
@@ -301,20 +300,6 @@
         },
       });
 
-        const view2Entity = viewer.entities.add({
-        name: `${satData.name} Vision`,
-        position: positionView,
-        rectangle: {
-          coordinates: Cesium.Rectangle.fromDegrees(satData.lon-viewrad, satData.lat-viewrad, satData.lon+viewrad, satData.lat+viewrad),
-          semiMinorAxis: radius,
-          semiMajorAxis: radius,
-          material: color.withAlpha(0.8),
-          outlineColor: Cesium.Color.BLACK,
-          outlineWidth: 2,
-        },
-         
-      });
-
       // Create orbit polyline
       const orbitPoints = calculateOrbitPoints(satData.satrec, new Date());
       if (orbitPoints.length > 0) {
@@ -331,7 +316,7 @@
         orbitEntities.push(orbitEntity);
       }
 
-      return [satEntity, viewEntity, view2Entity];
+      return [satEntity, viewEntity];
     }
 
     // Function to update satellite positions
@@ -355,7 +340,7 @@
               const position2 = Cesium.Cartesian3.fromDegrees(longitude, latitude);
               satelliteEntities[index].position = position;
               visionEntities[index].position = position2;
-              vision2Entities[index].position = position2;
+
 
               // Update satellite data
               satData.lon = longitude;
@@ -443,7 +428,6 @@
       satellites = [];
       satelliteEntities = [];
       visionEntities = [];
-      vision2Entities = [];
       orbitEntities = [];
     };
 
@@ -502,10 +486,10 @@
               satellites.push(satData);
           
               // Create entities for the satellite
-              const [satEntity, viewEntity, view2Entity] = createSatelliteEntity(satData, satellites.length - 1);
+              const [satEntity, viewEntity] = createSatelliteEntity(satData, satellites.length - 1);
               satelliteEntities.push(satEntity);
               visionEntities.push(viewEntity);
-              vision2Entities.push(view2Entity);
+
           
               successCount++;
             } else {
@@ -564,7 +548,7 @@
           const [satEntity, viewEntity, view2Entity] = createSatelliteEntity(sat, index);
           satelliteEntities.push(satEntity);
           visionEntities.push(viewEntity);
-          vision2Entities.push(view2Entity);
+
         });
 
         // Update satellite list

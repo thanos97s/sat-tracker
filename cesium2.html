@@ -561,10 +561,10 @@
         
         // Create entities for all satellites
         satellites.forEach((sat, index) => {
-          const [satEntity, viewEntity, viewEntity2] = createSatelliteEntity(sat, index);
+          const [satEntity, viewEntity, view2Entity] = createSatelliteEntity(sat, index);
           satelliteEntities.push(satEntity);
           visionEntities.push(viewEntity);
-          vision2Entities.push(viewEntity2);
+          vision2Entities.push(view2Entity);
         });
 
         // Update satellite list

@@ -159,10 +159,13 @@
         res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=PAUSAT-1&FORMAT=tle');
         text += await res.text();
 
-        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=RASAT&FORMAT=tle');
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?CATNR=37791&FORMAT=tle');
         text += await res.text();
         
         res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=HELLAS-SAT&FORMAT=tle');
+        text += await res.text();
+
+        res = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=PLEIADES&FORMAT=tle');
         text += await res.text();
         
         const TLELines = text.trim().replace(/\r\n/g, '\n').split('\n');
